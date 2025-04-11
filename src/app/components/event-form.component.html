@@ -1,0 +1,141 @@
+<div class="crud-container">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <mat-toolbar color="primary">
+    <span>Administrador de Eventos</span>
+  </mat-toolbar>
+
+  <div class="content-container">
+    <!-- Formulario -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>{{ getFormTitle() }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          
+          <!-- Title Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="title" />
+            <mat-error *ngIf="f['title']?.hasError('required')">El título es requerido</mat-error>
+            <mat-error *ngIf="f['title']?.hasError('minlength')">El título debe tener al menos 3 caracteres</mat-error>
+          </mat-form-field>
+
+          <!-- Start Date Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Fecha de Inicio</mat-label>
+            <input matInput [matDatepicker]="startDate" formControlName="start" />
+            <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+            <mat-datepicker #startDate></mat-datepicker>
+            <mat-error *ngIf="f['start']?.hasError('required')">La fecha de inicio es requerida</mat-error>
+          </mat-form-field>
+
+          <!-- End Date Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Fecha de Fin</mat-label>
+            <input matInput [matDatepicker]="endDate" formControlName="end" />
+            <mat-datepicker-toggle matSuffix [for]="endDate"></mat-datepicker-toggle>
+            <mat-datepicker #endDate></mat-datepicker>
+            <mat-error *ngIf="f['end']?.hasError('required')">La fecha de fin es requerida</mat-error>
+          </mat-form-field>
+
+          <!-- Type Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="type">
+              <mat-option value="conference">Meeting</mat-option>
+              <mat-option value="workshop">Task</mat-option>
+              <mat-option value="seminar">Remainder</mat-option>
+              <mat-option value="seminar">Appointment</mat-option>
+              <mat-option value="seminar">Deadline</mat-option>
+              <mat-option value="seminar">Other</mat-option>
+            </mat-select>
+            <mat-error *ngIf="f['type']?.hasError('required')">El tipo de evento es requerido</mat-error>
+          </mat-form-field>
+
+          <!-- Description Field -->
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea matInput formControlName="description" rows="3"></textarea>
+            <mat-error *ngIf="f['description']?.hasError('required')">La descripción es requerida</mat-error>
+            <mat-error *ngIf="f['description']?.hasError('minlength')">La descripción debe tener al menos 10 caracteres</mat-error>
+          </mat-form-field>
+
+          <!-- Buttons -->
+          <div class="button-container">
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isLoading">
+              {{ getSubmitButtonText() }}
+              <mat-icon *ngIf="isLoading" class="button-spinner">hourglass_empty</mat-icon>
+            </button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+              {{ getSubmitButtonText() }}
+            </button>
+            <button mat-raised-button color="warn" type="button" (click)="onCancel()" *ngIf="isEditing">
+              Cancelar
+            </button>
+            <button mat-raised-button color="accent" type="button" (click)="resetForm()" *ngIf="!isEditing">
+              Limpiar
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabla de Eventos -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>Lista de Eventos</mat-card-title>
+        <mat-card-subtitle *ngIf="events.length === 0">No hay eventos registrados</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="events" class="full-width">
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef> Título </th>
+            <td mat-cell *matCellDef="let event"> {{ event.title }} </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef> Tipo </th>
+            <td mat-cell *matCellDef="let event"> 
+              {{ event.type === 'conference' ? 'Conferencia' : 
+                 event.type === 'workshop' ? 'Taller' : 'Seminario' }} 
+            </td>
+          </ng-container>
+
+          <!-- Start Date Column -->
+          <ng-container matColumnDef="start">
+            <th mat-header-cell *matHeaderCellDef> Inicio </th>
+            <td mat-cell *matCellDef="let event"> {{ event.start | date: 'medium' }} </td>
+          </ng-container>
+
+          <!-- End Date Column -->
+          <ng-container matColumnDef="end">
+            <th mat-header-cell *matHeaderCellDef> Fin </th>
+            <td mat-cell *matCellDef="let event"> {{ event.end | date: 'medium' }} </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let event">
+              <button mat-icon-button color="primary" (click)="onEdit(event)" matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="onDelete(event.id!)" matTooltip="Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

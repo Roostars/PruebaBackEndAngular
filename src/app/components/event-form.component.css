@@ -1,0 +1,82 @@
+.crud-container {
+  padding: 20px;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-card, .table-card {
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+mat-table {
+  margin-top: 20px;
+}
+
+mat-toolbar {
+  margin-bottom: 20px;
+}
+
+/* Agrega esto a tu event-form.component.css */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.button-spinner {
+  margin-left: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+/* Responsive layout */
+@media (min-width: 992px) {
+  .content-container {
+    flex-direction: row;
+  }
+  
+  .form-card {
+    flex: 1;
+    margin-right: 20px;
+  }
+  
+  .table-card {
+    flex: 2;
+  }
+}
