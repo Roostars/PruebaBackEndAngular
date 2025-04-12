@@ -1,7 +1,7 @@
 // event.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { catchError, Observable } from 'rxjs';
 import { environment } from '../services/environment';
 import { AppEvent } from '../services/event.model';
 
@@ -14,22 +14,28 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  // Obtener todos los eventos
   getEvents(): Observable<AppEvent[]> {
     return this.http.get<AppEvent[]>(this.apiUrl);
   }
 
-  // Crear un nuevo evento
-  createEvent(event: Event): Observable<AppEvent> {
-    return this.http.post<AppEvent>(this.apiUrl, event);
+  createEvent(event: AppEvent): Observable<string> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(this.apiUrl, event, {headers, responseType: 'text'})
+    .pipe(
+      catchError(error => {
+        console.error('Error en la petición:', error);
+        throw new Error('Failed to create event');
+      })
+    );;
   }
 
-  // Actualizar un evento existente
   updateEvent(id: string, event: AppEvent): Observable<AppEvent> {
     return this.http.put<AppEvent>(`${this.apiUrl}/${id}`, event);
   }
 
-  // Eliminar un evento
+  
   deleteEvent(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

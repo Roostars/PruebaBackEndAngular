@@ -8,7 +8,7 @@
   </mat-toolbar>
 
   <div class="content-container">
-    <!-- Formulario -->
+    <!-- Formulary -->
     <mat-card class="form-card">
       <mat-card-header>
         <mat-card-title>{{ getFormTitle() }}</mat-card-title>
@@ -46,12 +46,12 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Tipo</mat-label>
             <mat-select formControlName="type">
-              <mat-option value="conference">Meeting</mat-option>
-              <mat-option value="workshop">Task</mat-option>
-              <mat-option value="seminar">Remainder</mat-option>
-              <mat-option value="seminar">Appointment</mat-option>
-              <mat-option value="seminar">Deadline</mat-option>
-              <mat-option value="seminar">Other</mat-option>
+              <mat-option value=1>Meeting</mat-option>
+              <mat-option value=2>Task</mat-option>
+              <mat-option value=3>Remainder</mat-option>
+              <mat-option value=4>Appointment</mat-option>
+              <mat-option value=5>Deadline</mat-option>
+              <mat-option value=6>Other</mat-option>
             </mat-select>
             <mat-error *ngIf="f['type']?.hasError('required')">El tipo de evento es requerido</mat-error>
           </mat-form-field>
@@ -70,9 +70,6 @@
               {{ getSubmitButtonText() }}
               <mat-icon *ngIf="isLoading" class="button-spinner">hourglass_empty</mat-icon>
             </button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-              {{ getSubmitButtonText() }}
-            </button>
             <button mat-raised-button color="warn" type="button" (click)="onCancel()" *ngIf="isEditing">
               Cancelar
             </button>
@@ -84,7 +81,7 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Tabla de Eventos -->
+    <!-- Event table -->
     <mat-card class="table-card">
       <mat-card-header>
         <mat-card-title>Lista de Eventos</mat-card-title>

@@ -37,7 +37,6 @@ mat-toolbar {
   margin-bottom: 20px;
 }
 
-/* Agrega esto a tu event-form.component.css */
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -65,7 +64,6 @@ mat-toolbar {
   color: white !important;
 }
 
-/* Responsive layout */
 @media (min-width: 992px) {
   .content-container {
     flex-direction: row;

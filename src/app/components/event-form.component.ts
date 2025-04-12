@@ -70,15 +70,15 @@ export class EventFormComponent implements OnInit {
   }
 
   loadEvents(): void {
-    this.isLoading = true; // <-- Activar carga
+    this.isLoading = true;
     this.eventService.getEvents().subscribe({
       next: (events) => {
         this.events = events;
-        this.isLoading = false; // <-- Desactivar carga
+        this.isLoading = false; 
       },
       error: (err) => {
         this.showError('Error al cargar eventos');
-        this.isLoading = false; // <-- Desactivar carga en caso de error
+        this.isLoading = false; 
       }
     });
   }
@@ -86,14 +86,13 @@ export class EventFormComponent implements OnInit {
   onSubmit(): void {
     if (this.form.invalid) return;
     
-    this.isLoading = true; // <-- Activar carga
+    this.isLoading = true; 
     const eventData = this.form.value;
     
     if (this.isEditing && this.currentEventId !== null) {
       this.eventService.updateEvent(this.currentEventId, eventData).subscribe({
         next: (updatedEvent) => {
-          // ... lógica de actualización
-          this.isLoading = false; // <-- Desactivar carga
+          this.isLoading = false; 
         },
         error: (err) => {
           this.showError('Error al actualizar el evento');
@@ -101,13 +100,22 @@ export class EventFormComponent implements OnInit {
         }
       });
     } else {
-      this.eventService.createEvent(eventData).subscribe({
+      const newEvent: AppEvent = {
+        title: eventData.title,
+        start: this.formatToISO(eventData.start),
+        end: this.formatToISO(eventData.end),
+        type: Number(eventData.type),
+        description: eventData.description
+      };
+      
+      this.eventService.createEvent(newEvent).subscribe({
         next: (newEvent) => {
-          // ... lógica de creación
+          this.loadEvents();
           this.isLoading = false;
         },
         error: (err) => {
-          this.showError('Error al crear el evento');
+          if (err.status == 200) this.loadEvents();
+          else this.showError('Error al crear el evento');
           this.isLoading = false;
         }
       });
@@ -119,9 +127,9 @@ export class EventFormComponent implements OnInit {
     this.currentEventId = event.id || null;
     this.form.patchValue({
       title: event.title,
-      start: event.start,
-      end: event.end,
-      type: event.type,
+      start: this.formatToISO(event.start),
+      end:  this.formatToISO(event.end),
+      type:  Number(event.type),
       description: event.description
     });
   }
@@ -131,7 +139,7 @@ export class EventFormComponent implements OnInit {
       this.isLoading = true;
       this.eventService.deleteEvent(id).subscribe({
         next: () => {
-          // ... lógica de eliminación
+          this.loadEvents();
           this.isLoading = false;
         },
         error: (err) => {
@@ -171,4 +179,14 @@ export class EventFormComponent implements OnInit {
   getSubmitButtonText(): string {
     return this.isEditing ? 'Actualizar' : 'Crear';
   }
+
+  private formatToISO(dateStr: string): string {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      throw new Error("Fecha inválida");
+    }
+    return date.toISOString(); 
+  }
+  
+  
 }
